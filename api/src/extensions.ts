@@ -97,6 +97,13 @@ const defaultOptions: Options = {
 	watch: env['EXTENSIONS_AUTO_RELOAD'] && env['NODE_ENV'] !== 'development',
 };
 
+const assertSuccessRegister = () => {
+	if (env['EXTENSIONS_REQUIRE_ALL_LOADED'] === 'true'){
+		logger.error('Cannot proceed without all extensions loaded. Aborting execution.');
+		process.exit(-7);
+	}
+}
+
 class ExtensionManager {
 	private isLoaded = false;
 	private options: Options;
@@ -264,6 +271,7 @@ class ExtensionManager {
 		} catch (err: any) {
 			logger.warn(`Couldn't load extensions`);
 			logger.warn(err);
+			assertSuccessRegister();
 		}
 
 		await this.registerHooks();
@@ -393,6 +401,7 @@ class ExtensionManager {
 		} catch (error: any) {
 			logger.warn(`Couldn't bundle App extensions`);
 			logger.warn(error);
+			assertSuccessRegister();
 		}
 
 		return null;
@@ -438,6 +447,7 @@ class ExtensionManager {
 			} catch (error: any) {
 				logger.warn(`Couldn't register hook "${hook.name}"`);
 				logger.warn(error);
+				assertSuccessRegister();
 			}
 		}
 	}
@@ -461,6 +471,7 @@ class ExtensionManager {
 			} catch (error: any) {
 				logger.warn(`Couldn't register endpoint "${endpoint.name}"`);
 				logger.warn(error);
+				assertSuccessRegister();
 			}
 		}
 	}
@@ -498,6 +509,7 @@ class ExtensionManager {
 			} catch (error: any) {
 				logger.warn(`Couldn't register operation "${operation.name}"`);
 				logger.warn(error);
+				assertSuccessRegister();
 			}
 		}
 	}
@@ -594,6 +606,7 @@ class ExtensionManager {
 				if (content.trim().length === 0) {
 					logger.warn(`Couldn't register embed hook. Provided code is empty!`);
 					return;
+
 				}
 
 				if (position === 'head') {
